@@ -116,7 +116,6 @@ void kernel_adi(int tsteps, int n,
         v[j][i] = p[i][j] * v[j+1][i] + q[i][j];
       }
     }
-    #pragma omp barrier
     //Row Sweep
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
     for (i=1; i<_PB_N-1; i++) 
@@ -135,7 +134,6 @@ void kernel_adi(int tsteps, int n,
         u[i][j] = p[i][j] * u[i][j+1] + q[i][j];
       }
     }
-    #pragma omp barrier
   }
   }
 #pragma endscop

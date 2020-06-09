@@ -88,7 +88,6 @@ void kernel_heat_3d(int tsteps,
         }
       }
     }
-    #pragma omp barrier
     #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
     for (i = 1; i < _PB_N-1; i++) 
     {
@@ -103,7 +102,6 @@ void kernel_heat_3d(int tsteps,
         }
       }
     }
-    #pragma omp barrier
   }
   }
 #pragma endscop

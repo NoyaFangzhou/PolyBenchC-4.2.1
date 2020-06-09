@@ -74,7 +74,6 @@ void kernel_seidel_2d(int tsteps,
         A[i][j] = (A[i-1][j-1] + A[i-1][j] + A[i-1][j+1]
           + A[i][j-1] + A[i][j] + A[i][j+1]
           + A[i+1][j-1] + A[i+1][j] + A[i+1][j+1])/SCALAR_VAL(9.0);
-    #pragma omp barrier
   }
 #pragma endscop
 
