@@ -70,11 +70,9 @@ void kernel_jacobi_2d(int tsteps,
   int t, i, j;
 
 #pragma scop
-#pragma omp parallel num_threads(THREAD_NUM)
-{
-#pragma omp master
-{
   for (t = 0; t < _PB_TSTEPS; t++)
+  {
+  #pragma omp parallel num_threads(THREAD_NUM)
   {
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
     for (i = 1; i < _PB_N - 1; i++)
@@ -87,8 +85,7 @@ void kernel_jacobi_2d(int tsteps,
         A[i][j] = SCALAR_VAL(0.2) * (B[i][j] + B[i][j-1] + B[i][1+j] + B[1+i][j] + B[i-1][j]);
     #pragma omp barrier
   }
-}
-}
+  }
 #pragma endscop
 
 }

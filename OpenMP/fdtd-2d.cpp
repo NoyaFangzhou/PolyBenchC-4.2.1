@@ -98,11 +98,9 @@ void kernel_fdtd_2d(int tmax,
   int t, i, j;
 
 #pragma scop
-#pragma omp parallel num_threads(THREAD_NUM)
-{
-#pragma omp master
-{
   for(t = 0; t < _PB_TMAX; t++)
+  {
+  #pragma omp parallel num_threads(THREAD_NUM)
   {
     #pragma omp for schedule(static, CHUNK_SIZE)
     for (j = 0; j < _PB_NY; j++)
@@ -125,8 +123,7 @@ void kernel_fdtd_2d(int tmax,
                      ey[i+1][j] - ey[i][j]);
     #pragma omp barrier
   }
-}
-}
+  }
 #pragma endscop
 }
 

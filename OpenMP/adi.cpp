@@ -92,11 +92,10 @@ void kernel_adi(int tsteps, int n,
   d = -mul2 / SCALAR_VAL(2.0);
   e = SCALAR_VAL(1.0)+mul2;
   f = d;
-#pragma omp parallel num_threads(THREAD_NUM)
-{
-#pragma omp master
-{
+
   for (t=1; t<=_PB_TSTEPS; t++) 
+  {
+  #pragma omp parallel num_threads(THREAD_NUM)
   {
     //Column Sweep
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
@@ -138,8 +137,7 @@ void kernel_adi(int tsteps, int n,
     }
     #pragma omp barrier
   }
-}
-}
+  }
 #pragma endscop
 }
 

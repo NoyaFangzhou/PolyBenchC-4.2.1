@@ -65,10 +65,8 @@ void kernel_seidel_2d(int tsteps,
   int t, i, j;
 
 #pragma scop
-#pragma omp parallel num_threads(THREAD_NUM)
-{
-#pragma omp master
-{
+  #pragma omp parallel num_threads(THREAD_NUM)
+  {
   for (t = 0; t <= _PB_TSTEPS - 1; t++)
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
     for (i = 1; i<= _PB_N - 2; i++)
@@ -77,8 +75,7 @@ void kernel_seidel_2d(int tsteps,
           + A[i][j-1] + A[i][j] + A[i][j+1]
           + A[i+1][j-1] + A[i+1][j] + A[i+1][j+1])/SCALAR_VAL(9.0);
     #pragma omp barrier
-}
-}
+  }
 #pragma endscop
 
 }
