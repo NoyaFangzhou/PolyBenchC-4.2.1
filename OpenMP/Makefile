@@ -22,6 +22,5 @@ constant_bound_bench = 2mm 3mm mvt atax bicg gemm gemver gesummv doitgen deriche
 check:
 	$(foreach name, $(constant_bound_bench), $(CC) $(CCFLAG) $(name).cpp $(UTIL_DIR)/polybench.c -I$(HEADER_DIR) -I$(UTIL_DIR) $(CONSTFLAG) -o $(BIN_DIR)/$(name) ;)
 
-
 veryclean:
 	rm $(BIN_DIR)/*
