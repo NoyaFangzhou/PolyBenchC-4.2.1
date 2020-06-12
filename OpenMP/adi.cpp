@@ -99,7 +99,7 @@ void kernel_adi(int tsteps, int n,
   {
     //Column Sweep
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
-    for (i=0; i<_PB_N-1; i++)
+    for (i=0; i<_PB_N-2; i++)
     {
       v[0][i+1] = SCALAR_VAL(1.0);
       p[i+1][0] = SCALAR_VAL(0.0);
@@ -107,12 +107,14 @@ void kernel_adi(int tsteps, int n,
       for (j=0; j<_PB_N-2; j++) 
       {
         p[i+1][j+1] = -c / (a*p[i+1][j]+b);
-        q[i+1][j+1] = (-d*u[j+1][i])+(SCALAR_VAL(1.0)+SCALAR_VAL(2.0)*d)*u[j+1][i+1] - f*u[j+1][i+2]-(a*p[i+1][j]+b);
+        q[i+1][j+1] = (-d*u[j+1][i]+(SCALAR_VAL(1.0)+SCALAR_VAL(2.0)*d)*u[j+1][i+1] - f*u[j+1][i+2]-a*q[i+1][j])/(a*p[i+1][j]+b);
       }
+
       v[_PB_N-1][i+1] = SCALAR_VAL(1.0);
+      
       for (j = 0; j < _PB_N-2; j++)
       {
-        v[_PB_N-1-j][i+1] = p[i+1][_PB_N-1-j] * v[_PB_N-j][i+1] + q[i+1][_PB_N-1-j];
+        v[_PB_N-2-j][i+1] = p[i+1][_PB_N-2-j] * v[_PB_N-1-j][i+1] + q[i+1][_PB_N-2-j];
       }
     }
     // for (i=1; i<_PB_N-1; i++) 
@@ -134,7 +136,7 @@ void kernel_adi(int tsteps, int n,
     // }
     //Row Sweep
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
-    for (i=0; i<_PB_N-1; i++)
+    for (i=0; i<_PB_N-2; i++)
     {
       u[i+1][0] = SCALAR_VAL(1.0);
       p[i+1][0] = SCALAR_VAL(0.0);
@@ -145,13 +147,9 @@ void kernel_adi(int tsteps, int n,
         q[i+1][j+1] = (-a*v[i][j+1]+(SCALAR_VAL(1.0)+SCALAR_VAL(2.0)*a)*v[i+1][j+1] - c*v[i+2][j+1]-d*q[i+1][j])/(d*p[i+1][j]+e);
       }
       u[i+1][_PB_N-1] = SCALAR_VAL(1.0);
-      for (j=_PB_N-2; j>=1; j--) 
+      for (j=0; j<_PB_N-2; j++)
       {
-        u[i][j] = p[i][j] * u[i][j+1] + q[i][j];
-      }
-      for (j=0; j<_PB_N-2; j--)
-      {
-        u[i+1][_PB_N-1-j] = p[i+1][_PB_N-1-j] * u[i+1][_PB_N-j] + q[i+1][_PB_N-1-j];
+        u[i+1][_PB_N-2-j] = p[i+1][_PB_N-2-j] * u[i+1][_PB_N-1-j] + q[i+1][_PB_N-2-j];
       }
     }
     // for (i=1; i<_PB_N-1; i++) 
