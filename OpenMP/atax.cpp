@@ -75,7 +75,9 @@ void kernel_atax(int m, int n,
 {
   #pragma omp for schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_N; i++)
-    y[i] = 0;
+  {
+    y[i] = SCALAR_VAL(0.0);
+  }
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_M; i++)
   {
@@ -84,10 +86,12 @@ void kernel_atax(int m, int n,
       tmp[i] = tmp[i] + A[i][j] * x[j];
   }
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
-  for (i = 0; i < _PB_M; i++)
+  for (i = 0; i < _PB_N; i++)
   {
-    for (j = 0; j < _PB_N; j++)
-      y[j] = y[j] + A[i][j] * tmp[i];
+    for (j = 0; j < _PB_M; j++)
+    {
+        y[i] = y[i] + A[j][i] * tmp[j];
+    }
   }
 }
 #pragma endscop

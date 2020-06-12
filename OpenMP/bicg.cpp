@@ -84,16 +84,24 @@ void kernel_bicg(int m, int n,
 {
   #pragma omp for schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_M; i++)
-    s[i] = 0;
-  
+  {
+    s[i] = SCALAR_VAL(0.0);
+  }
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_N; i++)
   {
     q[i] = SCALAR_VAL(0.0);
     for (j = 0; j < _PB_M; j++)
     {
-      s[j] = s[j] + r[i] * A[i][j];
       q[i] = q[i] + A[i][j] * p[j];
+    }
+  }
+  #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+  for (i = 0; i < _PB_M; i++)
+  {
+    for (j = 0; j < _PB_N; j++)
+    {
+      s[i] = s[i] + r[j] * A[j][i];
     }
   }
 }
