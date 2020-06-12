@@ -75,30 +75,44 @@ void kernel_heat_3d(int tsteps,
   #pragma omp parallel num_threads(THREAD_NUM)
   {
     #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
-    for (i = 1; i < _PB_N-1; i++) 
+    // for (i = 1; i < _PB_N-1; i++) 
+    for (i = 0; i < _PB_N-2; i++) 
     {
-      for (j = 1; j < _PB_N-1; j++) 
+      // for (j = 1; j < _PB_N-1; j++) 
+      for (j = 0; j < _PB_N-2; j++) 
       {
-        for (k = 1; k < _PB_N-1; k++) 
+        // for (k = 1; k < _PB_N-1; k++) 
+        for (k = 0; k < _PB_N-2; k++) 
         {
-          B[i][j][k] =   SCALAR_VAL(0.125) * (A[i+1][j][k] - SCALAR_VAL(2.0) * A[i][j][k] + A[i-1][j][k])
-                       + SCALAR_VAL(0.125) * (A[i][j+1][k] - SCALAR_VAL(2.0) * A[i][j][k] + A[i][j-1][k])
-                       + SCALAR_VAL(0.125) * (A[i][j][k+1] - SCALAR_VAL(2.0) * A[i][j][k] + A[i][j][k-1])
-                       + A[i][j][k];
+          // B[i][j][k] =   SCALAR_VAL(0.125) * (A[i+1][j][k] - SCALAR_VAL(2.0) * A[i][j][k] + A[i-1][j][k])
+          //              + SCALAR_VAL(0.125) * (A[i][j+1][k] - SCALAR_VAL(2.0) * A[i][j][k] + A[i][j-1][k])
+          //              + SCALAR_VAL(0.125) * (A[i][j][k+1] - SCALAR_VAL(2.0) * A[i][j][k] + A[i][j][k-1])
+          //              + A[i][j][k];
+          B[i+1][j+1][k+1] =   SCALAR_VAL(0.125) * (A[i+2][j+1][k+1] - SCALAR_VAL(2.0) * A[i+1][j+1][k+1] + A[i][j+1][k+1])
+                       + SCALAR_VAL(0.125) * (A[i+1][j+2][k+1] - SCALAR_VAL(2.0) * A[i+1][j+1][k+1] + A[i+1][j][k+1])
+                       + SCALAR_VAL(0.125) * (A[i+1][j+1][k+2] - SCALAR_VAL(2.0) * A[i+1][j+1][k+1] + A[i+1][j+1][k])
+                       + A[i+1][j+1][k+1];
         }
       }
     }
     #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
-    for (i = 1; i < _PB_N-1; i++) 
+    // for (i = 1; i < _PB_N-1; i++) 
+    for (i = 0; i < _PB_N-2; i++) 
     {
-      for (j = 1; j < _PB_N-1; j++) 
+      // for (j = 1; j < _PB_N-1; j++) 
+      for (j = 0; j < _PB_N-2; j++) 
       {
-        for (k = 1; k < _PB_N-1; k++) 
+        // for (k = 1; k < _PB_N-1; k++) 
+        for (k = 0; k < _PB_N-2; k++) 
         {
-          A[i][j][k] =   SCALAR_VAL(0.125) * (B[i+1][j][k] - SCALAR_VAL(2.0) * B[i][j][k] + B[i-1][j][k])
-                            + SCALAR_VAL(0.125) * (B[i][j+1][k] - SCALAR_VAL(2.0) * B[i][j][k] + B[i][j-1][k])
-                            + SCALAR_VAL(0.125) * (B[i][j][k+1] - SCALAR_VAL(2.0) * B[i][j][k] + B[i][j][k-1])
-                            + B[i][j][k];
+          // A[i][j][k] =   SCALAR_VAL(0.125) * (B[i+1][j][k] - SCALAR_VAL(2.0) * B[i][j][k] + B[i-1][j][k])
+          //                   + SCALAR_VAL(0.125) * (B[i][j+1][k] - SCALAR_VAL(2.0) * B[i][j][k] + B[i][j-1][k])
+          //                   + SCALAR_VAL(0.125) * (B[i][j][k+1] - SCALAR_VAL(2.0) * B[i][j][k] + B[i][j][k-1])
+          //                   + B[i][j][k];
+          A[i+1][j+1][k+1] =   SCALAR_VAL(0.125) * (B[i+2][j+1][k+1] - SCALAR_VAL(2.0) * B[i+1][j+1][k+1] + B[i][j+1][k+1])
+                            + SCALAR_VAL(0.125) * (B[i+1][j+2][k+1] - SCALAR_VAL(2.0) * B[i+1][j+1][k+1] + B[i+1][j][k+1])
+                            + SCALAR_VAL(0.125) * (B[i+1][j+1][k+2] - SCALAR_VAL(2.0) * B[i+1][j+1][k+1] + B[i+1][j+1][k])
+                            + B[i+1][j+1][k+1];
         }
       }
     }

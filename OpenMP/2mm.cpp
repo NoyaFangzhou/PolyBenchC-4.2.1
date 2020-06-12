@@ -84,27 +84,39 @@ void kernel_2mm(int ni, int nj, int nk, int nl,
 {
   int i, j, k;
 
+  polybench_init_per_thread_instruments;
+
 #pragma scop
 #pragma omp parallel num_threads(THREAD_NUM)
 {
+  polybench_start_per_thread_instruments;
   /* D := alpha*A*B*C + beta*D */
   #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_NI; i++)
+  {
     for (j = 0; j < _PB_NJ; j++)
     {
       tmp[i][j] = SCALAR_VAL(0.0);
       for (k = 0; k < _PB_NK; ++k)
+      {
         tmp[i][j] += alpha * A[i][k] * B[k][j];
+      }
     }
+  }
 
   #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_NI; i++)
+  {
     for (j = 0; j < _PB_NL; j++)
     {
       D[i][j] *= beta;
       for (k = 0; k < _PB_NJ; ++k)
+      {
         D[i][j] += tmp[i][k] * C[k][j];
+      }
     }
+  }
+  polybench_stop_per_thread_instruments;
 }
 #pragma endscop
 

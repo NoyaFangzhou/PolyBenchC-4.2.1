@@ -176,6 +176,10 @@
 # define polybench_start_instruments
 # define polybench_stop_instruments
 # define polybench_print_instruments
+/* Performance-related multithread instrumentation. See polybench.c */
+# define polybench_init_per_thread_instruments
+# define polybench_start_per_thread_instruments
+# define polybench_stop_per_thread_instruments
 
 
 /* PAPI support. */

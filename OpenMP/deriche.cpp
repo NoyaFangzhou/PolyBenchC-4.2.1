@@ -112,7 +112,8 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
     yp2 = SCALAR_VAL(0.0);
     xp1 = SCALAR_VAL(0.0);
     xp2 = SCALAR_VAL(0.0);
-    for (j=_PB_H-1; j>=0; j--) 
+    // for (j=_PB_H-1; j>=0; j--) 
+    for (j=0; j<_PB_H; j++)
     {
       y2[i][j] = a3*xp1 + a4*xp2 + b1*yp1 + b2*yp2;
       xp2 = xp1;
@@ -151,7 +152,8 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
     tp2 = SCALAR_VAL(0.0);
     yp1 = SCALAR_VAL(0.0);
     yp2 = SCALAR_VAL(0.0);
-    for (i=_PB_W-1; i>=0; i--) 
+    for (i=0; i<_PB_W; i++)
+    // for (i=_PB_W-1; i>=0; i--) 
     {
       y2[i][j] = a7*tp1 + a8*tp2 + b1*yp1 + b2*yp2;
       tp2 = tp1;
