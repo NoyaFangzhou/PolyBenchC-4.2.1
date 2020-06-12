@@ -112,8 +112,9 @@ void kernel_fdtd_2d(int tmax,
         ey[i+1][j] = ey[i+1][j] - SCALAR_VAL(0.5)*(hz[i+1][j]-hz[i+1][j]);
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
     for (i = 0; i < _PB_NX; i++)
-      for (j = 1; j < _PB_NY; j++)
-        ex[i][j] = ex[i][j] - SCALAR_VAL(0.5)*(hz[i][j]-hz[i][j-1]);
+      // for (j = 1; j < _PB_NY; j++)
+      for (j = 0; j < _PB_NY-1; j++)
+        ex[i][j+1] = ex[i][j+1] - SCALAR_VAL(0.5)*(hz[i][j+1]-hz[i][j]);
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
     for (i = 0; i < _PB_NX - 1; i++)
       for (j = 0; j < _PB_NY - 1; j++)

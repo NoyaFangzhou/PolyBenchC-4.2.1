@@ -115,11 +115,11 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
     // for (j=_PB_H-1; j>=0; j--) 
     for (j=0; j<_PB_H; j++)
     {
-      y2[i][j] = a3*xp1 + a4*xp2 + b1*yp1 + b2*yp2;
+      y2[i][_PB_H-1-j] = a3*xp1 + a4*xp2 + b1*yp1 + b2*yp2;
       xp2 = xp1;
-      xp1 = imgIn[i][j];
+      xp1 = imgIn[i][_PB_H-1-j];
       yp2 = yp1;
-      yp1 = y2[i][j];
+      yp1 = y2[i][_PB_H-1-j];
     }
   }
 
@@ -155,11 +155,11 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
     for (i=0; i<_PB_W; i++)
     // for (i=_PB_W-1; i>=0; i--) 
     {
-      y2[i][j] = a7*tp1 + a8*tp2 + b1*yp1 + b2*yp2;
+      y2[_PB_W-1-i][j] = a7*tp1 + a8*tp2 + b1*yp1 + b2*yp2;
       tp2 = tp1;
-      tp1 = imgOut[i][j];
+      tp1 = imgOut[_PB_W-1-i][j];
       yp2 = yp1;
-      yp1 = y2[i][j];
+      yp1 = y2[_PB_W-1-i][j];
     }
   }
 

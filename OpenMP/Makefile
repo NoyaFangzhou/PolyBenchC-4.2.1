@@ -13,7 +13,7 @@ PAPI_LIB=/localdisk/local/lib/libpapi.a
 
 CC= g++
 CCFLAG=-O3 -std=c++11 -g -fopenmp
-CONSTFLAG=-DPOLYBENCH_TIME -DCHUNK_SIZE=4 -DTHREAD_NUM=4 -DPOLYBENCH_DUMP_ARRAYS -DMINI_DATASET
+CONSTFLAG=-DPOLYBENCH_TIME -DCHUNK_SIZE=4 -DTHREAD_NUM=2 -DPOLYBENCH_DUMP_ARRAYS -DMINI_DATASET
 
 all_bench = stencil 2mm 3mm adi atax bicg cholesky correlation covariance deriche doitgen durbin fdtd_2d floyd_warshall gemm gemver gesummv gramschmidt heat_3d jacobi_1d jacobi_2d lu ludcmp mvt nussinov seidel_2d symm syr2k syrk trisolv trmm
 
