@@ -112,7 +112,7 @@ void kernel_adi(int tsteps, int n,
       v[_PB_N-1][i+1] = SCALAR_VAL(1.0);
       for (j = 0; j < _PB_N-2; j++)
       {
-        v[_PB_N-1-j][i+1] = p[i+1][_PB_N-1-j] * v[_PB_N-j] + q[i+1][_PB_N-1-j];
+        v[_PB_N-1-j][i+1] = p[i+1][_PB_N-1-j] * v[_PB_N-j][i+1] + q[i+1][_PB_N-1-j];
       }
     }
     // for (i=1; i<_PB_N-1; i++) 
