@@ -87,15 +87,25 @@ void kernel_mvt(int n,
 #pragma scop
 #pragma omp parallel num_threads(THREAD_NUM)
 {
+  polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_N; i++)
+  {
     for (j = 0; j < _PB_N; j++)
+    {
       x1[i] = x1[i] + A[i][j] * y_1[j];
+    }
+  }
 
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_N; i++)
+  {
     for (j = 0; j < _PB_N; j++)
+    {
       x2[i] = x2[i] + A[j][i] * y_2[j];
+    }
+  }
+  polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
 #pragma endscop
 

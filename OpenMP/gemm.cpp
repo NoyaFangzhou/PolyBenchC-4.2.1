@@ -88,17 +88,23 @@ void kernel_gemm(int ni, int nj, int nk,
 #pragma scop
 #pragma omp parallel num_threads(THREAD_NUM)
 {
+  polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_NI; i++) 
   {
     for (j = 0; j < _PB_NJ; j++)
+    {
       C[i][j] *= beta;
+    }
     for (k = 0; k < _PB_NK; k++) 
     {
       for (j = 0; j < _PB_NJ; j++)
+      {
         C[i][j] += alpha * A[i][k] * B[k][j];
+      }
     }
   }
+  polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
 #pragma endscop
 

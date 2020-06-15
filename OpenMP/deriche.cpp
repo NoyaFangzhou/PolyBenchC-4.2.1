@@ -90,6 +90,7 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
    c1 = c2 = 1;
 #pragma omp parallel num_threads(THREAD_NUM)
 {
+  polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i=0; i<_PB_W; i++) 
   {
@@ -165,8 +166,13 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
 
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i=0; i<_PB_W; i++)
+  {
     for (j=0; j<_PB_H; j++)
+    {
       imgOut[i][j] = c2*(y1[i][j] + y2[i][j]);
+    }
+  }
+  polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
 #pragma endscop
 }

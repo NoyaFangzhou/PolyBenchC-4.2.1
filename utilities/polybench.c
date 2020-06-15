@@ -19,14 +19,15 @@
 #include <sys/resource.h>
 #include <sched.h>
 #include <math.h>
-#ifdef _OPENMP
-# include <omp.h>
-#endif
 
 #if defined(POLYBENCH_PAPI)
 # undef POLYBENCH_PAPI
 # include "polybench.h"
 # define POLYBENCH_PAPI
+#elif defined(POLYBENCH_PAPI_OPENMP)
+# undef POLYBENCH_PAPI_OPENMP
+# include "polybench.h"
+# define POLYBENCH_PAPI_OPENMP
 #else
 # include "polybench.h"
 #endif
@@ -45,17 +46,21 @@
 int polybench_papi_counters_threadid = POLYBENCH_THREAD_MONITOR;
 double polybench_program_total_flops = 0;
 
-#ifdef POLYBENCH_PAPI
+#if defined(POLYBENCH_PAPI) || defined(POLYBENCH_PAPI_OPENMP)
 # include <papi.h>
 # define POLYBENCH_MAX_NB_PAPI_COUNTERS 96
   char* _polybench_papi_eventlist[] = {
 #include "papi_counters.list"
     NULL
   };
-  int polybench_papi_eventset;
   int polybench_papi_eventlist[POLYBENCH_MAX_NB_PAPI_COUNTERS];
+#ifdef POLYBENCH_PAPI
+  int polybench_papi_eventset;
   long_long polybench_papi_values[POLYBENCH_MAX_NB_PAPI_COUNTERS];
-
+#elif defined(POLYBENCH_PAPI_OPENMP)
+  int polybench_papi_eventsets[THREAD_NUM+1];
+  long_long polybench_papi_values[THREAD_NUM][POLYBENCH_MAX_NB_PAPI_COUNTERS];
+#endif
 #endif
 
 /*
@@ -145,7 +150,7 @@ void polybench_linux_standard_scheduler()
 }
 #endif
 
-#ifdef POLYBENCH_PAPI
+#if defined(POLYBENCH_PAPI) || defined(POLYBENCH_PAPI_OPENMP)
 
 static
 void test_fail(char *file, int line, char *call, int retval)
@@ -186,6 +191,10 @@ void test_fail(char *file, int line, char *call, int retval)
   exit (1);
 }
 
+#endif
+/* ! POLYBENCH_PAPI || POLYBENCH_PAPI_OPENMP */
+
+#ifdef POLYBENCH_PAPI
 
 void polybench_papi_init()
 {
@@ -349,6 +358,131 @@ void polybench_papi_print()
 
 #endif
 /* ! POLYBENCH_PAPI */
+
+#ifdef POLYBENCH_PAPI_OPENMP
+
+void polybench_papi_omp_init()
+{
+  int retval;
+  if ((retval = PAPI_library_init (PAPI_VER_CURRENT)) != PAPI_VER_CURRENT)
+    test_fail (__FILE__, __LINE__, "PAPI_library_init", retval);
+
+}
+
+
+void polybench_papi_omp_close()
+{
+  int retval;
+  // int thread;
+  // for (thread = 0; polybench_papi_eventsets[thread] != PAPI_NULL; ++thread)
+  // {
+  //   if ((retval = PAPI_destroy_eventset (&(polybench_papi_eventsets[thread])))
+  //     != PAPI_OK)
+  //     test_fail (__FILE__, __LINE__, "PAPI_destroy_eventset", retval);
+  // }
+  if (PAPI_is_initialized ())
+    PAPI_shutdown ();
+}
+
+int polybench_papi_omp_start_counter(int tid)
+{
+  /* in each thread */
+
+# ifndef POLYBENCH_NO_FLUSH_CACHE
+  polybench_flush_cache();
+# endif
+  
+  int retval = 1;
+  int polybench_papi_eventset = PAPI_NULL;
+  char descr[PAPI_MAX_STR_LEN];
+  PAPI_event_info_t evinfo;
+  /* bind to thread */
+  if ((retval = PAPI_thread_init((long unsigned int (*)(void)) omp_get_thread_num)) != PAPI_OK)
+    test_fail (__FILE__, __LINE__, "PAPI_thread_init", retval);
+  /* create event set */
+  if ((retval = PAPI_create_eventset (&polybench_papi_eventset))
+      != PAPI_OK)
+    test_fail (__FILE__, __LINE__, "PAPI_create_eventset", retval);
+  /* add all event to this event set */
+  int k;
+  for (k = 0; _polybench_papi_eventlist[k]; ++k)
+  {
+    if ((retval = PAPI_event_name_to_code (_polybench_papi_eventlist[k],
+            &(polybench_papi_eventlist[k]))) != PAPI_OK)
+      test_fail (__FILE__, __LINE__, "PAPI_event_name_to_code", retval);
+    PAPI_event_code_to_name (polybench_papi_eventlist[k], descr);
+    if (PAPI_add_event (polybench_papi_eventset, polybench_papi_eventlist[k]) != PAPI_OK)
+      test_fail (__FILE__, __LINE__, "PAPI_add_event", 1);
+    if (PAPI_get_event_info (polybench_papi_eventlist[k], &evinfo)
+      != PAPI_OK)
+      test_fail (__FILE__, __LINE__, "PAPI_get_event_info", retval);
+    if ((retval = PAPI_start (polybench_papi_eventset)) != PAPI_OK)
+      test_fail (__FILE__, __LINE__, "PAPI_start", retval);
+  }
+  polybench_papi_eventlist[k] = 0;
+  polybench_papi_eventsets[k] = PAPI_NULL;
+  polybench_papi_eventsets[tid] = polybench_papi_eventset;
+  return 0;
+}
+
+
+void polybench_papi_omp_stop_counter(int tid)
+{
+  int retval;
+  /* read counter result for each event */
+  long_long values[1];
+  int k;
+  for (k = 0; _polybench_papi_eventlist[k]; ++k)
+  {
+    values[0] = 0;
+    if ((retval = PAPI_read (polybench_papi_eventsets[tid], &values[0]))
+    != PAPI_OK)
+      test_fail (__FILE__, __LINE__, "PAPI_read", retval);
+    if ((retval = PAPI_stop (polybench_papi_eventsets[tid], NULL)) != PAPI_OK)
+      test_fail (__FILE__, __LINE__, "PAPI_stop", retval);
+    polybench_papi_values[tid][k] = values[0];
+  }
+  /* Remove all events in the eventset */
+  if (PAPI_cleanup_eventset (polybench_papi_eventsets[tid]) != PAPI_OK)
+    test_fail (__FILE__, __LINE__, "PAPI_cleanup_eventset", retval);
+  /* Free all memory and data structures, EventSet must be empty. */
+  if (PAPI_destroy_eventset (&(polybench_papi_eventsets[tid])) != PAPI_OK)
+    test_fail (__FILE__, __LINE__, "PAPI_destroy_eventset", retval);
+  PAPI_unregister_thread();
+}
+
+
+void polybench_papi_omp_print()
+{
+  int verbose = 0;
+#ifdef POLYBENCH_PAPI_VERBOSE
+  verbose = 1;
+#endif
+  int evid;
+  for (evid = 0; polybench_papi_eventlist[evid] != 0; ++evid)
+  {
+    long_long sum = 0;
+    int thread;
+    for (thread = 0; thread < THREAD_NUM; ++thread)
+    {
+      sum += polybench_papi_values[thread][evid];
+      if (verbose)
+      {
+        printf ("On thread %d:\n", thread);
+        printf ("%s=", _polybench_papi_eventlist[evid]);
+        printf ("%llu ", polybench_papi_values[thread][evid]);
+        printf ("\n");
+      }
+    }
+    if (verbose)
+      printf ("%s=", _polybench_papi_eventlist[evid]);
+    printf("%llu ", sum / THREAD_NUM);
+    printf ("\n");
+  }
+}
+
+#endif
+/* ! POLYBENCH_PAPI_OPENMP */
 
 void polybench_prepare_instruments()
 {

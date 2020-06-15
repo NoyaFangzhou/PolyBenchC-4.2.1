@@ -70,22 +70,28 @@ void kernel_jacobi_1d(int tsteps,
 
 #pragma scop
   
-  for (t = 0; t < _PB_TSTEPS; t++)
-  {
+  // for (t = 0; t < _PB_TSTEPS; t++)
+  // {
   #pragma omp parallel num_threads(THREAD_NUM)
   {
+    polybench_start_per_thread_instruments(omp_get_thread_num());
     #pragma omp for schedule(static, CHUNK_SIZE)
     for (i = 0; i < _PB_N - 2; i++)
+    {
       B[i+1] = 0.33333 * (A[i] + A[i+1] + A[i + 2]);
+    }
     // for (i = 1; i < _PB_N - 1; i++)
       // B[i] = 0.33333 * (A[i-1] + A[i] + A[i + 1]);
     #pragma omp for schedule(static, CHUNK_SIZE)
     for (i = 0; i < _PB_N - 2; i++)
+    {
       A[i+1] = 0.33333 * (B[i] + B[i+1] + B[i + 2]);
+    }
+    polybench_stop_per_thread_instruments(omp_get_thread_num());
     // for (i = 1; i < _PB_N - 1; i++)
     //   A[i] = 0.33333 * (B[i-1] + B[i] + B[i + 1]);
   }
-  }
+  // }
 #pragma endscop
 }
 

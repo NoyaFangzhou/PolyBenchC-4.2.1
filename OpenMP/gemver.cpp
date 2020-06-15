@@ -99,24 +99,40 @@ void kernel_gemver(int n,
 #pragma scop
 #pragma omp parallel num_threads(THREAD_NUM)
 {
+  polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_N; i++)
+  {
     for (j = 0; j < _PB_N; j++)
+    {
       A[i][j] = A[i][j] + u1[i] * v1[j] + u2[i] * v2[j];
+    }
+  }
 
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_N; i++)
+  {
     for (j = 0; j < _PB_N; j++)
+    {
       x[i] = x[i] + beta * A[j][i] * y[j];
+    }
+  }
 
   #pragma omp for schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_N; i++)
+  {
     x[i] = x[i] + z[i];
+  }
   
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
   for (i = 0; i < _PB_N; i++)
+  {
     for (j = 0; j < _PB_N; j++)
+    {
       w[i] = w[i] +  alpha * A[i][j] * x[j];
+    }
+  }
+  polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
 #pragma endscop
 }

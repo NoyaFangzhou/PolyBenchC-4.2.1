@@ -28,6 +28,9 @@
 # define POLYBENCH_H
 
 # include <stdlib.h>
+#ifdef _OPENMP
+# include <omp.h>
+#endif
 
 /* Array padding. By default, none is used. */
 # ifndef POLYBENCH_PADDING_FACTOR
@@ -177,9 +180,8 @@
 # define polybench_stop_instruments
 # define polybench_print_instruments
 /* Performance-related multithread instrumentation. See polybench.c */
-# define polybench_init_per_thread_instruments
-# define polybench_start_per_thread_instruments
-# define polybench_stop_per_thread_instruments
+# define polybench_start_per_thread_instruments(tid)
+# define polybench_stop_per_thread_instruments(tid)
 
 
 /* PAPI support. */
@@ -206,7 +208,26 @@ extern const unsigned int polybench_papi_eventlist[];
 
 #  define polybench_print_instruments polybench_papi_print();
 # endif
+/* ! POLYBENCH_PAPI */
 
+
+/* PAPI OpenMP support. */
+# ifdef POLYBENCH_PAPI_OPENMP
+extern const unsigned int polybench_papi_eventlist[];
+extern int polybench_papi_eventsets[];
+#  undef polybench_start_instruments
+#  undef polybench_print_instruments
+#  undef polybench_start_per_thread_instruments
+#  undef polybench_stop_per_thread_instruments
+#  define polybench_start_instruments polybench_papi_omp_init();
+#  define polybench_start_per_thread_instruments(tid) polybench_papi_omp_start_counter(tid);
+#  define polybench_stop_per_thread_instruments(tid) polybench_papi_omp_stop_counter(tid);
+#  define polybench_print_instruments \
+    polybench_papi_omp_close(); \
+    polybench_papi_omp_print();
+
+#endif
+/* ! POLYBENCH_PAPI_OPENMP */
 
 /* Timing support. */
 # if defined(POLYBENCH_TIME) || defined(POLYBENCH_GFLOPS)
@@ -229,6 +250,12 @@ extern void polybench_papi_stop_counter(int evid);
 extern void polybench_papi_init();
 extern void polybench_papi_close();
 extern void polybench_papi_print();
+# elif defined(POLYBENCH_PAPI_OPENMP)
+extern void polybench_papi_omp_init();
+extern int polybench_papi_omp_start_counter(int tid);
+extern void polybench_papi_omp_stop_counter(int tid);
+extern void polybench_papi_omp_close();
+extern void polybench_papi_omp_print();
 # endif
 
 /* Function prototypes. */
