@@ -58,7 +58,7 @@ double polybench_program_total_flops = 0;
   int polybench_papi_eventset;
   long_long polybench_papi_values[POLYBENCH_MAX_NB_PAPI_COUNTERS];
 #elif defined(POLYBENCH_PAPI_OPENMP)
-  int polybench_papi_eventsets[THREAD_NUM+1];
+  int polybench_papi_eventsets[THREAD_NUM];
   long_long polybench_papi_values[THREAD_NUM][POLYBENCH_MAX_NB_PAPI_COUNTERS];
 #endif
 #endif
@@ -366,6 +366,9 @@ void polybench_papi_omp_init()
   int retval;
   if ((retval = PAPI_library_init (PAPI_VER_CURRENT)) != PAPI_VER_CURRENT)
     test_fail (__FILE__, __LINE__, "PAPI_library_init", retval);
+  /* bind to thread */
+  if ((retval = PAPI_thread_init((long unsigned int (*)(void)) omp_get_thread_num)) != PAPI_OK)
+    test_fail (__FILE__, __LINE__, "PAPI_thread_init", retval);
 
 }
 
@@ -396,9 +399,6 @@ int polybench_papi_omp_start_counter(int tid)
   int polybench_papi_eventset = PAPI_NULL;
   char descr[PAPI_MAX_STR_LEN];
   PAPI_event_info_t evinfo;
-  /* bind to thread */
-  if ((retval = PAPI_thread_init((long unsigned int (*)(void)) omp_get_thread_num)) != PAPI_OK)
-    test_fail (__FILE__, __LINE__, "PAPI_thread_init", retval);
   /* create event set */
   if ((retval = PAPI_create_eventset (&polybench_papi_eventset))
       != PAPI_OK)
@@ -420,7 +420,6 @@ int polybench_papi_omp_start_counter(int tid)
       test_fail (__FILE__, __LINE__, "PAPI_start", retval);
   }
   polybench_papi_eventlist[k] = 0;
-  polybench_papi_eventsets[k] = PAPI_NULL;
   polybench_papi_eventsets[tid] = polybench_papi_eventset;
   return 0;
 }
