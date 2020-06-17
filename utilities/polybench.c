@@ -370,6 +370,9 @@ void polybench_papi_omp_init()
   if ((retval = PAPI_thread_init((long unsigned int (*)(void)) omp_get_thread_num)) != PAPI_OK)
     test_fail (__FILE__, __LINE__, "PAPI_thread_init", retval);
 
+  /* bind to thread */
+  if ((retval = PAPI_thread_init((long unsigned int (*)(void)) omp_get_thread_num)) != PAPI_OK)
+    test_fail (__FILE__, __LINE__, "PAPI_thread_init", retval);
 }
 
 
