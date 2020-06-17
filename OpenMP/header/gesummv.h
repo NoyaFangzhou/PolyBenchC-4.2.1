@@ -18,23 +18,23 @@
 # if !defined(N)
 /* Define sample dataset sizes. */
 #  ifdef MINI_DATASET
-#   define N 30
+#   define N 30 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef SMALL_DATASET
-#   define N 90
+#   define N 90 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef MEDIUM_DATASET
-#   define N 250
+#   define N 250 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef LARGE_DATASET
-#   define N 1300
+#   define N 1300 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#   define N 2800
+#   define N 2800 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 

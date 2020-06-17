@@ -18,33 +18,33 @@
 # if !defined(NI) && !defined(NJ) && !defined(NK)
 /* Define sample dataset sizes. */
 #  ifdef MINI_DATASET
-#   define NI 20
-#   define NJ 25
-#   define NK 30
+#   define NI 20 * POLYBENCH_LOOP_ITERATION
+#   define NJ 25 * POLYBENCH_LOOP_ITERATION
+#   define NK 30 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef SMALL_DATASET
-#   define NI 60
-#   define NJ 70
-#   define NK 80
+#   define NI 60 * POLYBENCH_LOOP_ITERATION
+#   define NJ 70 * POLYBENCH_LOOP_ITERATION
+#   define NK 80 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef MEDIUM_DATASET
-#   define NI 200
-#   define NJ 220
-#   define NK 240
+#   define NI 200 * POLYBENCH_LOOP_ITERATION
+#   define NJ 220 * POLYBENCH_LOOP_ITERATION
+#   define NK 240 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef LARGE_DATASET
-#   define NI 1000
-#   define NJ 1100
-#   define NK 1200
+#   define NI 1000 * POLYBENCH_LOOP_ITERATION
+#   define NJ 1100 * POLYBENCH_LOOP_ITERATION
+#   define NK 1200 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#   define NI 2000
-#   define NJ 2300
-#   define NK 2600
+#   define NI 2000 * POLYBENCH_LOOP_ITERATION
+#   define NJ 2300 * POLYBENCH_LOOP_ITERATION
+#   define NK 2600 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 

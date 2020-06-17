@@ -18,28 +18,28 @@
 # if !defined(W) && !defined(H)
 /* Define sample dataset sizes. */
 #  ifdef MINI_DATASET
-#   define W 64
-#   define H 64
+#   define W 64 * POLYBENCH_LOOP_ITERATION
+#   define H 64 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef SMALL_DATASET
-#   define W 192
-#   define H 128
+#   define W 192 * POLYBENCH_LOOP_ITERATION
+#   define H 128 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef MEDIUM_DATASET
-#   define W 720
-#   define H 480
+#   define W 720 * POLYBENCH_LOOP_ITERATION
+#   define H 480 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef LARGE_DATASET
-#   define W 4096
-#   define H 2160
+#   define W 4096 * POLYBENCH_LOOP_ITERATION
+#   define H 2160 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#   define W 7680
-#   define H 4320
+#   define W 7680 * POLYBENCH_LOOP_ITERATION
+#   define H 4320 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 

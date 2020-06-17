@@ -19,32 +19,32 @@
 /* Define sample dataset sizes. */
 #  ifdef MINI_DATASET
 #   define TMAX 20
-#   define NX 20
-#   define NY 30
+#   define NX 20 * POLYBENCH_LOOP_ITERATION
+#   define NY 30 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef SMALL_DATASET
 #   define TMAX 40
-#   define NX 60
-#   define NY 80
+#   define NX 60 * POLYBENCH_LOOP_ITERATION
+#   define NY 80 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef MEDIUM_DATASET
 #   define TMAX 100
-#   define NX 200
-#   define NY 240
+#   define NX 200 * POLYBENCH_LOOP_ITERATION
+#   define NY 240 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef LARGE_DATASET
 #   define TMAX 500
-#   define NX 1000
-#   define NY 1200
+#   define NX 1000 * POLYBENCH_LOOP_ITERATION
+#   define NY 1200 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
 #   define TMAX 1000
-#   define NX 2000
-#   define NY 2600
+#   define NX 2000 * POLYBENCH_LOOP_ITERATION
+#   define NY 2600 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 

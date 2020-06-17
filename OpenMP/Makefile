@@ -12,7 +12,7 @@ PAPI_LIB_DIR=/localdisk/local/include
 PAPI_LIB=/localdisk/local/lib/libpapi.a
 
 CC= g++
-CCFLAG=-O3 -std=c++11 -g -fopenmp
+CCFLAG=-O3 -std=c++11 -g
 CONSTFLAG=-DPOLYBENCH_PAPI_OPENMP -DCHUNK_SIZE=4 -DTHREAD_NUM=2
 LDFLAG=$(PAPI_LIB)
 
