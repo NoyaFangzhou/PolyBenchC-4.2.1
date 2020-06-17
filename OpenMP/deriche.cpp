@@ -88,10 +88,12 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
    b1 =  POW_FUN(SCALAR_VAL(2.0),-alpha);
    b2 = -EXP_FUN(SCALAR_VAL(-2.0)*alpha);
    c1 = c2 = 1;
+# ifdef _OPENMP
 #pragma omp parallel num_threads(THREAD_NUM)
 {
   polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i=0; i<_PB_W; i++) 
   {
     ym1 = SCALAR_VAL(0.0);
@@ -105,8 +107,9 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
       ym1 = y1[i][j];
     }
   }
-
+# ifdef _OPENMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i=0; i<_PB_W; i++) 
   {
     yp1 = SCALAR_VAL(0.0);
@@ -123,15 +126,17 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
       yp1 = y2[i][_PB_H-1-j];
     }
   }
-
+# ifdef _OPENMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i=0; i<_PB_W; i++)
     for (j=0; j<_PB_H; j++) 
     {
       imgOut[i][j] = c1 * (y1[i][j] + y2[i][j]);
     }
-
+# ifdef _OPENMP
   #pragma omp for private(i) schedule(static, CHUNK_SIZE)
+# endif
   for (j=0; j<_PB_H; j++) 
   {
     tm1 = SCALAR_VAL(0.0);
@@ -145,8 +150,9 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
       ym1 = y1 [i][j];
     }
   }
-
+# ifdef _OPENMP
   #pragma omp for private(i) schedule(static, CHUNK_SIZE)
+# endif
   for (j=0; j<_PB_H; j++) 
   {
     tp1 = SCALAR_VAL(0.0);
@@ -163,8 +169,9 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
       yp1 = y2[_PB_W-1-i][j];
     }
   }
-
+# ifdef _OPENMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i=0; i<_PB_W; i++)
   {
     for (j=0; j<_PB_H; j++)
@@ -172,8 +179,10 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
       imgOut[i][j] = c2*(y1[i][j] + y2[i][j]);
     }
   }
+# ifdef _OPENMP
   polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
+# endif
 #pragma endscop
 }
 

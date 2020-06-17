@@ -80,10 +80,12 @@ void kernel_gesummv(int n,
   int i, j;
 
 #pragma scop
+# ifdef _OPENMP
 #pragma omp parallel num_threads(THREAD_NUM)
 {
   polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_N; i++)
   {
     tmp[i] = SCALAR_VAL(0.0);
@@ -96,7 +98,9 @@ void kernel_gesummv(int n,
     y[i] = alpha * tmp[i] + beta * y[i];
   }
   polybench_stop_per_thread_instruments(omp_get_thread_num());
+# ifdef _OPENMP
 }
+# endif
 #pragma endscop
 
 }

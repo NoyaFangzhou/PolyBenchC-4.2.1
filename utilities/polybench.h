@@ -76,6 +76,18 @@
 #  define POLYBENCH_RESTRICT
 # endif
 
+/* Scale the array size to make the performance counter stable. By default,
+ * we set this scale factor to 1.
+ * i.e. 
+ * perf stat -C 0,2,4,6 -e LLC-loads:u,LLC-load-misses:u,LLC-stores:u,LLC-store-misses:u <run command>
+ */
+# ifdef _OPENMP
+#  define POLYBENCH_LOOP_ITERATION  1000
+# else
+/* default: */
+#  define POLYBENCH_LOOP_ITERATION  1
+# endif
+
 /* Macros to reference an array. Generic for heap and stack arrays
    (C99).  Each array dimensionality has his own macro, to be used at
    declaration or as a function argument.
@@ -176,7 +188,7 @@
 
 
 /* Performance-related instrumentation. See polybench.c */
-# define polybench_start_instruments
+# define polybench_start_instruments polybench_prepare_instruments();
 # define polybench_stop_instruments
 # define polybench_print_instruments
 /* Performance-related multithread instrumentation. See polybench.c */

@@ -81,11 +81,13 @@ void kernel_3mm(int ni, int nj, int nk, int nl, int nm,
   int i, j, k;
 
 #pragma scop
+# ifdef _OPENMP
 #pragma omp parallel num_threads(THREAD_NUM)
 {
   polybench_start_per_thread_instruments(omp_get_thread_num());
-  /* E := A*B */
   #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
+# endif
+  /* E := A*B */
   for (i = 0; i < _PB_NI; i++)
   {
     for (j = 0; j < _PB_NJ; j++)
@@ -97,8 +99,10 @@ void kernel_3mm(int ni, int nj, int nk, int nl, int nm,
       }
     }
   }
-  /* F := C*D */
+# ifdef _OPENMP  
   #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
+# endif
+  /* F := C*D */
   for (i = 0; i < _PB_NJ; i++)
   {
     for (j = 0; j < _PB_NL; j++)
@@ -110,8 +114,10 @@ void kernel_3mm(int ni, int nj, int nk, int nl, int nm,
       }
     }
   }
-  /* G := E*F */
+# ifdef _OPENMP  
   #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
+# endif
+  /* G := E*F */
   for (i = 0; i < _PB_NI; i++)
   {
     for (j = 0; j < _PB_NL; j++)
@@ -123,8 +129,10 @@ void kernel_3mm(int ni, int nj, int nk, int nl, int nm,
       }
     }
   }
+# ifdef _OPENMP
   polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
+# endif
 #pragma endscop
 
 }

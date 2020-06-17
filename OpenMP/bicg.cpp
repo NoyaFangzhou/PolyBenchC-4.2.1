@@ -80,15 +80,19 @@ void kernel_bicg(int m, int n,
   int i, j;
 
 #pragma scop
+# ifdef _OPEMP
 #pragma omp parallel num_threads(THREAD_NUM)
 {
   polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_M; i++)
   {
     s[i] = SCALAR_VAL(0.0);
   }
+# ifdef _OPEMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_N; i++)
   {
     q[i] = SCALAR_VAL(0.0);
@@ -97,7 +101,9 @@ void kernel_bicg(int m, int n,
       q[i] = q[i] + A[i][j] * p[j];
     }
   }
+# ifdef _OPEMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_M; i++)
   {
     for (j = 0; j < _PB_N; j++)
@@ -105,8 +111,10 @@ void kernel_bicg(int m, int n,
       s[i] = s[i] + r[j] * A[j][i];
     }
   }
+# ifdef _OPEMP
   polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
+# endif
 #pragma endscop
 
 }

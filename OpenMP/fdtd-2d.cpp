@@ -98,17 +98,21 @@ void kernel_fdtd_2d(int tmax,
   int t, i, j;
 
 #pragma scop
-  // for(t = 0; t < _PB_TMAX; t++)
-  // {
+  for(t = 0; t < _PB_TMAX; t++)
+  {
+# ifdef _OPENMP
   #pragma omp parallel num_threads(THREAD_NUM)
   {
     polybench_start_per_thread_instruments(omp_get_thread_num());
     #pragma omp for schedule(static, CHUNK_SIZE)
+# endif
     for (j = 0; j < _PB_NY; j++)
     {
       ey[0][j] = _fict_[t];
     }
+# ifdef _OPENMP
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
     // for (i = 1; i < _PB_NX; i++)
     for (i = 0; i < _PB_NX-1; i++)
     {
@@ -117,7 +121,9 @@ void kernel_fdtd_2d(int tmax,
         ey[i+1][j] = ey[i+1][j] - SCALAR_VAL(0.5)*(hz[i+1][j]-hz[i][j]);
       }
     }
+# ifdef _OPENMP
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
     for (i = 0; i < _PB_NX; i++)
     {
       // for (j = 1; j < _PB_NY; j++)
@@ -126,7 +132,9 @@ void kernel_fdtd_2d(int tmax,
         ex[i][j+1] = ex[i][j+1] - SCALAR_VAL(0.5)*(hz[i][j+1]-hz[i][j]);
       }
     }
+# ifdef _OPENMP
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
     for (i = 0; i < _PB_NX - 1; i++)
     {
       for (j = 0; j < _PB_NY - 1; j++)
@@ -135,9 +143,11 @@ void kernel_fdtd_2d(int tmax,
                      ey[i+1][j] - ey[i][j]);
       }
     }
+# ifdef _OPENMP
     polybench_stop_per_thread_instruments(omp_get_thread_num());
   }
-  // }
+# endif
+  }
 #pragma endscop
 }
 

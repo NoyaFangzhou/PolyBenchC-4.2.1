@@ -19,27 +19,27 @@
 /* Define sample dataset sizes. */
 #  ifdef MINI_DATASET
 #   define TSTEPS 20
-#   define N 30
+#   define N 30 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef SMALL_DATASET
 #   define TSTEPS 40
-#   define N 120
+#   define N 120 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef MEDIUM_DATASET
 #   define TSTEPS 100
-#   define N 400
+#   define N 400 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef LARGE_DATASET
 #   define TSTEPS 500
-#   define N 2000
+#   define N 2000 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
 #   define TSTEPS 1000
-#   define N 4000
+#   define N 4000 * POLYBENCH_LOOP_ITERATION
 #  endif
 
 

@@ -93,13 +93,15 @@ void kernel_adi(int tsteps, int n,
   e = SCALAR_VAL(1.0)+mul2;
   f = d;
 
-  // for (t=1; t<=_PB_TSTEPS; t++) 
-  // {
+  for (t=0; t<_PB_TSTEPS; t++) 
+  {
+# ifdef _OPENMP
   #pragma omp parallel num_threads(THREAD_NUM)
   {
     polybench_start_per_thread_instruments(omp_get_thread_num());
     //Column Sweep
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
     for (i=0; i<_PB_N-2; i++)
     {
       v[0][i+1] = SCALAR_VAL(1.0);
@@ -136,7 +138,9 @@ void kernel_adi(int tsteps, int n,
     //   }
     // }
     //Row Sweep
+# ifdef _OPENMP
     #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
     for (i=0; i<_PB_N-2; i++)
     {
       u[i+1][0] = SCALAR_VAL(1.0);
@@ -169,9 +173,11 @@ void kernel_adi(int tsteps, int n,
     //     u[i][j] = p[i][j] * u[i][j+1] + q[i][j];
     //   }
     // }
+# ifdef _OPENMP
     polybench_stop_per_thread_instruments(omp_get_thread_num());
   }
-  // }
+# endif
+  }
 #pragma endscop
 }
 

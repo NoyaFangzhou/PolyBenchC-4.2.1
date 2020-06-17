@@ -70,12 +70,14 @@ void kernel_heat_3d(int tsteps,
 
 #pragma scop
 
-  // for (t = 1; t <= TSTEPS; t++) 
-  // {
+  for (t = 0; t < TSTEPS; t++) 
+  {
+# ifdef
   #pragma omp parallel num_threads(THREAD_NUM)
   {
     polybench_start_per_thread_instruments(omp_get_thread_num());
     #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
+# endif
     // for (i = 1; i < _PB_N-1; i++) 
     for (i = 0; i < _PB_N-2; i++) 
     {
@@ -96,7 +98,9 @@ void kernel_heat_3d(int tsteps,
         }
       }
     }
+# ifdef _OPENMP
     #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
+# endif
     // for (i = 1; i < _PB_N-1; i++) 
     for (i = 0; i < _PB_N-2; i++) 
     {
@@ -117,9 +121,11 @@ void kernel_heat_3d(int tsteps,
         }
       }
     }
+# ifdef _OPENMP
     polybench_stop_per_thread_instruments(omp_get_thread_num());
   }
-  // }
+# endif
+  }
 #pragma endscop
 
 }

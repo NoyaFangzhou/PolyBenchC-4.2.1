@@ -97,10 +97,12 @@ void kernel_gemver(int n,
   int i, j;
 
 #pragma scop
+# ifdef _OPENMP
 #pragma omp parallel num_threads(THREAD_NUM)
 {
   polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_N; i++)
   {
     for (j = 0; j < _PB_N; j++)
@@ -108,8 +110,9 @@ void kernel_gemver(int n,
       A[i][j] = A[i][j] + u1[i] * v1[j] + u2[i] * v2[j];
     }
   }
-
+# ifdef _OPENMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_N; i++)
   {
     for (j = 0; j < _PB_N; j++)
@@ -117,14 +120,16 @@ void kernel_gemver(int n,
       x[i] = x[i] + beta * A[j][i] * y[j];
     }
   }
-
+# ifdef _OPENMP
   #pragma omp for schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_N; i++)
   {
     x[i] = x[i] + z[i];
   }
-  
+# ifdef _OPENMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_N; i++)
   {
     for (j = 0; j < _PB_N; j++)
@@ -132,8 +137,10 @@ void kernel_gemver(int n,
       w[i] = w[i] +  alpha * A[i][j] * x[j];
     }
   }
+# ifdef _OPENMP
   polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
+# endif
 #pragma endscop
 }
 

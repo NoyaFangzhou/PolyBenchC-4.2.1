@@ -85,11 +85,13 @@ void kernel_2mm(int ni, int nj, int nk, int nl,
   int i, j, k;
 
 #pragma scop
+#ifdef _OPENMP
 #pragma omp parallel num_threads(THREAD_NUM)
 {
   polybench_start_per_thread_instruments(omp_get_thread_num());
-  /* D := alpha*A*B*C + beta*D */
   #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
+# endif
+  /* D := alpha*A*B*C + beta*D */
   for (i = 0; i < _PB_NI; i++)
   {
     for (j = 0; j < _PB_NJ; j++)
@@ -101,8 +103,9 @@ void kernel_2mm(int ni, int nj, int nk, int nl,
       }
     }
   }
-
+# ifdef _OPENMP
   #pragma omp for private(j, k) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_NI; i++)
   {
     for (j = 0; j < _PB_NL; j++)
@@ -114,8 +117,10 @@ void kernel_2mm(int ni, int nj, int nk, int nl,
       }
     }
   }
+# ifdef _OPENMP
   polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
+# endif
 #pragma endscop
 
 }

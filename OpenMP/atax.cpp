@@ -68,25 +68,33 @@ void kernel_atax(int m, int n,
          DATA_TYPE POLYBENCH_1D(y,N,n),
          DATA_TYPE POLYBENCH_1D(tmp,M,m))
 {
-  int i, j;
+  int t, i, j;
 
 #pragma scop
+# ifdef _OPENMP
 #pragma omp parallel num_threads(THREAD_NUM)
 {
   polybench_start_per_thread_instruments(omp_get_thread_num());
   #pragma omp for schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_N; i++)
   {
     y[i] = SCALAR_VAL(0.0);
   }
+# ifdef _OPENMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_M; i++)
   {
     tmp[i] = SCALAR_VAL(0.0);
     for (j = 0; j < _PB_N; j++)
+    {
       tmp[i] = tmp[i] + A[i][j] * x[j];
+    }
   }
+# ifdef _OPENMP
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
+# endif
   for (i = 0; i < _PB_N; i++)
   {
     for (j = 0; j < _PB_M; j++)
@@ -94,8 +102,10 @@ void kernel_atax(int m, int n,
         y[i] = y[i] + A[j][i] * tmp[j];
     }
   }
+# ifdef _OPENMP
   polybench_stop_per_thread_instruments(omp_get_thread_num());
 }
+# endif
 #pragma endscop
 
 }
