@@ -39,7 +39,7 @@
 
 /* Total LLC cache size. By default 32+MB.. */
 #ifndef POLYBENCH_CACHE_SIZE_KB
-# define POLYBENCH_CACHE_SIZE_KB 32770
+# define POLYBENCH_CACHE_SIZE_KB 8192
 #endif
 
 
@@ -656,7 +656,7 @@ xmalloc(size_t alloc_sz)
   /* By default, post-pad the arrays. Safe behavior, but likely useless. */
   polybench_inter_array_padding_sz += POLYBENCH_INTER_ARRAY_PADDING_FACTOR;
   size_t padded_sz = alloc_sz + polybench_inter_array_padding_sz;
-  int err = posix_memalign (&ret, 4096, padded_sz);
+  int err = posix_memalign (&ret, 64, padded_sz);
   if (! ret || err)
     {
       fprintf (stderr, "[PolyBench] posix_memalign: cannot allocate memory");
