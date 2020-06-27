@@ -24,11 +24,11 @@
 /* Array initialization. */
 static
 void init_array(int n, int m,
-		DATA_TYPE *alpha,
-		DATA_TYPE *beta,
-		DATA_TYPE POLYBENCH_2D(C,N,N,n,n),
-		DATA_TYPE POLYBENCH_2D(A,N,M,n,m),
-		DATA_TYPE POLYBENCH_2D(B,N,M,n,m))
+        DATA_TYPE *alpha,
+        DATA_TYPE *beta,
+        DATA_TYPE POLYBENCH_2D(C,N,N,n,n),
+        DATA_TYPE POLYBENCH_2D(A,N,M,n,m),
+        DATA_TYPE POLYBENCH_2D(B,N,M,n,m))
 {
   int i, j;
 
@@ -50,7 +50,7 @@ void init_array(int n, int m,
    Can be used also to check the correctness of the output. */
 static
 void print_array(int n,
-		 DATA_TYPE POLYBENCH_2D(C,N,N,n,n))
+         DATA_TYPE POLYBENCH_2D(C,N,N,n,n))
 {
   int i, j;
 
@@ -58,8 +58,8 @@ void print_array(int n,
   POLYBENCH_DUMP_BEGIN("C");
   for (i = 0; i < n; i++)
     for (j = 0; j < n; j++) {
-	if ((i * n + j) % 20 == 0) fprintf (POLYBENCH_DUMP_TARGET, "\n");
-	fprintf (POLYBENCH_DUMP_TARGET, DATA_PRINTF_MODIFIER, C[i][j]);
+    if ((i * n + j) % 20 == 0) fprintf (POLYBENCH_DUMP_TARGET, "\n");
+    fprintf (POLYBENCH_DUMP_TARGET, DATA_PRINTF_MODIFIER, C[i][j]);
     }
   POLYBENCH_DUMP_END("C");
   POLYBENCH_DUMP_FINISH;
@@ -70,11 +70,11 @@ void print_array(int n,
    including the call and return. */
 static
 void kernel_syr2k(int n, int m,
-		  DATA_TYPE alpha,
-		  DATA_TYPE beta,
-		  DATA_TYPE POLYBENCH_2D(C,N,N,n,n),
-		  DATA_TYPE POLYBENCH_2D(A,N,M,n,m),
-		  DATA_TYPE POLYBENCH_2D(B,N,M,n,m))
+          DATA_TYPE alpha,
+          DATA_TYPE beta,
+          DATA_TYPE POLYBENCH_2D(C,N,N,n,n),
+          DATA_TYPE POLYBENCH_2D(A,N,M,n,m),
+          DATA_TYPE POLYBENCH_2D(B,N,M,n,m))
 {
   int i, j, k;
 
@@ -85,6 +85,11 @@ void kernel_syr2k(int n, int m,
 //B is NxM
 //C is NxN
 #pragma scop
+#ifdef _OPENMP
+#pragma omp parallel num_threads(THREAD_NUM)
+{
+  #pragma omp for private(j, k) schedule(dynamic)
+#endif
   for (i = 0; i < _PB_N; i++) 
   {
     for (j = 0; j <= i; j++)
@@ -99,6 +104,9 @@ void kernel_syr2k(int n, int m,
       }
     }
   }
+#ifdef _OPENMP
+}
+#endif
 #pragma endscop
 
 }
@@ -119,19 +127,19 @@ int main(int argc, char** argv)
 
   /* Initialize array(s). */
   init_array (n, m, &alpha, &beta,
-	      POLYBENCH_ARRAY(C),
-	      POLYBENCH_ARRAY(A),
-	      POLYBENCH_ARRAY(B));
+          POLYBENCH_ARRAY(C),
+          POLYBENCH_ARRAY(A),
+          POLYBENCH_ARRAY(B));
 
   /* Start timer. */
   polybench_start_instruments;
 
   /* Run kernel. */
   kernel_syr2k (n, m,
-		alpha, beta,
-		POLYBENCH_ARRAY(C),
-		POLYBENCH_ARRAY(A),
-		POLYBENCH_ARRAY(B));
+        alpha, beta,
+        POLYBENCH_ARRAY(C),
+        POLYBENCH_ARRAY(A),
+        POLYBENCH_ARRAY(B));
 
   /* Stop and print timer. */
   polybench_stop_instruments;
