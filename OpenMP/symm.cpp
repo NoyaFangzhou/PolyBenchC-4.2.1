@@ -96,32 +96,17 @@ void kernel_symm(int m, int n,
 {
   #pragma omp for private(acc, j, k) schedule(dynamic)
 #endif
-  // for (i = 0; i < _PB_M; i++)
-  // {
-  //   for (j = 0; j < _PB_N; j++ )
-  //   {
-  //     temp2 = 0;
-  //     for (k = 0; k < i; k++) 
-  //     {
-  //       C[k][j] += alpha*B[i][j] * A[i][k];
-  //       temp2 += B[k][j] * A[i][k];
-  //     }
-  //     C[i][j] = beta * C[i][j] + alpha*B[i][j] * A[i][i] + alpha * temp2;
-  //   }
-  // }
-
-  /*  C := alpha*A*B + beta*C, A is symetric */
-  for (i = 0; i < _PB_NI; i++)
+  for (i = 0; i < _PB_M; i++)
   {
-    for (j = 0; j < _PB_NJ; j++)
+    for (j = 0; j < _PB_N; j++ )
     {
-      acc = 0;
-      for (k = 0; k < j - 1; k++)
+      temp2 = 0;
+      for (k = 0; k < i; k++) 
       {
-        C[k][j] += alpha * A[k][i] * B[i][j];
-        acc += B[k][j] * A[k][i];
+        C[k][j] += alpha*B[i][j] * A[i][k];
+        temp2 += B[k][j] * A[i][k];
       }
-      C[i][j] = beta * C[i][j] + alpha * A[i][i] * B[i][j] + alpha * acc;
+      C[i][j] = beta * C[i][j] + alpha*B[i][j] * A[i][i] + alpha * temp2;
     }
   }
 #ifdef _OPENMP
