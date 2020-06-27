@@ -1,4 +1,10 @@
 // Counters must be delimited with ',' including the last one.
 // C/C++ comments are allowed.
 // Both native and standard PAPI events are supported.
-"PAPI_L1_DCM",
+"r53412e",
+"r5304d3",
+"r5308d3",
+"r5302d3",
+"r5310d1",
+"r5320d1",
+"r5304d1",

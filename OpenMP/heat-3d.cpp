@@ -72,7 +72,7 @@ void kernel_heat_3d(int tsteps,
 
   for (t = 0; t < TSTEPS; t++) 
   {
-# ifdef
+# ifdef _OPENMP
   #pragma omp parallel num_threads(THREAD_NUM)
   {
     polybench_start_per_thread_instruments(omp_get_thread_num());

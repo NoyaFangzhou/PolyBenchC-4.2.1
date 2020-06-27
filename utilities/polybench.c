@@ -39,7 +39,7 @@
 
 /* Total LLC cache size. By default 32+MB.. */
 #ifndef POLYBENCH_CACHE_SIZE_KB
-# define POLYBENCH_CACHE_SIZE_KB 32770
+# define POLYBENCH_CACHE_SIZE_KB 8192
 #endif
 
 #ifndef POLYBENCH_CACHELINE_SIZE
