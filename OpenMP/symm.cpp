@@ -79,7 +79,7 @@ void kernel_symm(int m, int n,
          DATA_TYPE POLYBENCH_2D(B,M,N,m,n))
 {
   int i, j, k;
-  DATA_TYPE temp2;
+  DATA_TYPE temp2, acc;
 
 //BLAS PARAMS
 //SIDE = 'L'
@@ -89,23 +89,39 @@ void kernel_symm(int m, int n,
 // B is MxN
 // C is MxN
 //note that due to Fortran array layout, the code below more closely resembles upper triangular case in BLAS
+
 #pragma scop
 #ifdef _OPENMP
 #pragma omp parallel num_threads(THREAD_NUM)
 {
-  #pragma omp for private(temp2, j, k) schedule(dynamic)
+  #pragma omp for private(acc, j, k) schedule(dynamic)
 #endif
-  for (i = 0; i < _PB_M; i++)
+  // for (i = 0; i < _PB_M; i++)
+  // {
+  //   for (j = 0; j < _PB_N; j++ )
+  //   {
+  //     temp2 = 0;
+  //     for (k = 0; k < i; k++) 
+  //     {
+  //       C[k][j] += alpha*B[i][j] * A[i][k];
+  //       temp2 += B[k][j] * A[i][k];
+  //     }
+  //     C[i][j] = beta * C[i][j] + alpha*B[i][j] * A[i][i] + alpha * temp2;
+  //   }
+  // }
+
+  /*  C := alpha*A*B + beta*C, A is symetric */
+  for (i = 0; i < _PB_NI; i++)
   {
-    for (j = 0; j < _PB_N; j++ )
+    for (j = 0; j < _PB_NJ; j++)
     {
-      temp2 = 0;
-      for (k = 0; k < i; k++) 
+      acc = 0;
+      for (k = 0; k < j - 1; k++)
       {
-        C[k][j] += alpha*B[i][j] * A[i][k];
-        temp2 += B[k][j] * A[i][k];
+        C[k][j] += alpha * A[k][i] * B[i][j];
+        acc += B[k][j] * A[k][i];
       }
-      C[i][j] = beta * C[i][j] + alpha*B[i][j] * A[i][i] + alpha * temp2;
+      C[i][j] = beta * C[i][j] + alpha * A[i][i] * B[i][j] + alpha * acc;
     }
   }
 #ifdef _OPENMP
