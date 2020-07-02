@@ -130,10 +130,12 @@ void kernel_deriche(int w, int h, DATA_TYPE alpha,
   #pragma omp for private(j) schedule(static, CHUNK_SIZE)
 # endif
   for (i=0; i<_PB_W; i++)
+  {
     for (j=0; j<_PB_H; j++) 
     {
       imgOut[i][j] = c1 * (y1[i][j] + y2[i][j]);
     }
+  }
 # ifdef _OPENMP
   #pragma omp for private(i) schedule(static, CHUNK_SIZE)
 # endif
